@@ -28,6 +28,7 @@
 
   <script src="http://d3js.org/d3.v2.min.js?2.10.0"></script>
 
+  <script src="histd3.js" ></script>
 
 </head>
 
@@ -35,6 +36,13 @@
 
   <div id="the_canvas"> </div>
 
-  <script src="histd3.js" ></script>
+  <script>
+    var values = d3.range(1000).map(d3.random.irwinHall(10));
+    var my_hist = new hist(20, 0.0, 2.0);
+    console.log(my_hist);
+    console.log( my_hist.data(values) );
+    my_hist.data(values).draw("#the_canvas");
+  </script>
+
 
 </body>
