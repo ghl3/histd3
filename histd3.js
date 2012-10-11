@@ -9,9 +9,7 @@ function hist(num_bins, var_min, var_max) {
     this.min = var_min;
     this.max = var_max;
 
-    //this.data_values = null;
     this.hist_bins = null;
-
 
     // Calculate the boundaries
     this.margin = {top: 10, right: 30, bottom: 30, left: 30},
@@ -30,7 +28,6 @@ function hist(num_bins, var_min, var_max) {
 
 // Simple function to set the data
 hist.prototype.fill = function(values) { 
-    //this.data_values = values; 
 
     // Generate a histogram using twenty uniformly-spaced bins.
     this.hist_bins = d3.layout.histogram().bins(this.x.ticks(this.bins))(values);
@@ -47,6 +44,9 @@ hist.prototype.draw = function(selector) {
     
     console.log("drawing histogram");
 
+    // javascript kinda sucks... sorry...
+    var self = this;
+
     var formatCount = d3.format(",.0f");
 
     // Create the x axis
@@ -60,25 +60,25 @@ hist.prototype.draw = function(selector) {
 	.append("g")
 	.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-    var x_scale = this.x;
-    var y_scale = this.y;
-    var this_hist_bins = this.hist_bins;
+    //var x_scale = this.x;
+    //var y_scale = this.y;
+    //var this_hist_bins = this.hist_bins;
 
     var bar = svg.selectAll(".bar")
-	.data(this_hist_bins)
+	.data(self.hist_bins)
 	.enter().append("g")
 	.attr("class", "bar")    
 	.attr("transform", function(d) { 
 	    //return "translate(" + this.x(d.x) + "," + this.y(d.y) + ")"; 
-	    return "translate(" + x_scale(d.x) + "," + y_scale(d.y) + ")"; 
+	    return "translate(" + self.x(d.x) + "," + self.y(d.y) + ")"; 
 	});
     
-    var this_height = this.height;
+    // var this_height = this.height;
     
     bar.append("rect")
 	.attr("x", 1)
 	.attr("width", this.x(this.hist_bins[0].dx) - 1)
-	.attr("height", function(d) { return this_height - y_scale(d.y); });
+	.attr("height", function(d) { return self.height - self.y(d.y); });
 
     bar.append("text")
 	.attr("dy", ".75em")
