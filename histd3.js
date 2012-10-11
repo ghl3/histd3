@@ -3,8 +3,9 @@
 //
 
 // Declare the 'hist' class
-function hist(num_bins, var_min, var_max) {
-
+function hist(name, num_bins, var_min, var_max) {
+    
+    this.name = name;
     this.bins = num_bins;
     this.min = var_min;
     this.max = var_max;
@@ -24,7 +25,7 @@ function hist(num_bins, var_min, var_max) {
 
     // Create the y-axis mapping function
     this.y = d3.scale.linear();
-    
+
 }
 
 hist.prototype._update_scale = function() {
@@ -41,6 +42,7 @@ hist.prototype._update_scale = function() {
     
 }
 
+
 // Simple function to set the data
 hist.prototype.fill = function(values) { 
 
@@ -56,6 +58,31 @@ hist.prototype.fill = function(values) {
 
     return this;
 }
+
+/*
+hist.prototype._plot_histogram = function(selector) {
+
+    var bar = svg.selectAll(".bar")
+	.data(self.hist_bins)
+	.enter().append("g")
+	.attr("class", "bar")    
+	.attr("transform", function(d) { 
+	    return "translate(" + self.x(d.x) + "," + self.y(d.y) + ")"; 
+	});
+    
+    bar.append("rect")
+	.attr("x", 1)
+	.attr("width", this.x(this.hist_bins[0].dx) - 1)
+	.attr("height", function(d) { return self.height - self.y(d.y); });
+
+    bar.append("text")
+	.attr("dy", ".75em")
+	.attr("y", 6)
+	.attr("x", this.x(this.hist_bins[0].dx) / 2)
+	.attr("text-anchor", "middle")
+	.text(function(d) { return formatCount(d.y); });
+}
+*/
 
 // Function to draw the histogram in the
 // dom object described by the selector
@@ -80,16 +107,22 @@ hist.prototype.draw = function(selector) {
 	.scale(this.x)
 	.orient("bottom");
 
+    // Get the div and add a 'svg' canvas
     var svg = d3.select(selector).append("svg")
 	.attr("width", this.width + this.margin.left + this.margin.right)
 	.attr("height", this.height + this.margin.top + this.margin.bottom)
 	.append("g")
 	.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-    var bar = svg.selectAll(".bar")
+
+    // Grab the data of the class 'bar'
+    // But, also add the name
+    var bar_selector = ".bar ." + this.name;
+    var bar = svg.selectAll(bar_selector)
 	.data(self.hist_bins)
 	.enter().append("g")
-	.attr("class", "bar")    
+	.attr("class", "bar " + this.name)    
+	//.attr("class", this.name)    
 	.attr("transform", function(d) { 
 	    return "translate(" + self.x(d.x) + "," + self.y(d.y) + ")"; 
 	});
@@ -154,10 +187,45 @@ hist.prototype.add = function(other) {
 	var this_bin = this.hist_bins[i];
 	var other_bin = other.hist_bins[i];
 
+	if( this_bin.x != other_bin.x ) {
+	    console.log("Error: Histogram bin centers don't match...");
+	    return;
+	}
+	if( this_bin.dx != other_bin.dx ) {
+	    console.log("Error: Histogram bin widths don't match...");
+	    return;
+	}
+
 	// 'extend' this bin by the other's bin
 	this_bin.push.apply(this_bin, other_bin)
+
+	// Update the y values
+	this_bin.y += other_bin.y;
+	
     }
 
     console.log("Histograms successfully added");
+
+}
+
+//
+//
+//
+
+
+// Declare the 'hist' class
+function stack() {
+
+
+    // The [0] index in the array is
+    // the histogram on the bottom
+    this.hist_list = new Array();
+
+
+}
+
+stack.prototype.draw = function(selector) {
+    
+    // Create a temporary array of lifted histograms
 
 }

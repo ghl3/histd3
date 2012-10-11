@@ -7,8 +7,13 @@
     font: 10px sans-serif;
     }
 
-    .bar rect {
+    .my_hist rect {
     fill: steelblue;
+    shape-rendering: crispEdges;
+    }
+
+    .other_hist rect {
+    fill: green;
     shape-rendering: crispEdges;
     }
 
@@ -37,21 +42,20 @@
   <div id="the_canvas"> </div>
 
   <script>
-    var values = d3.range(1000).map(d3.random.irwinHall(10));
-    var my_hist = new hist(20, 0.0, 2.0);
 
+    var values = d3.range(1000).map(d3.random.normal(.5, .2)); //irwinHall(10));
+    var my_hist = new hist("my_hist", 20, 0.0, 2.0);
+    my_hist.fill(values);
 
-    //my_hist.fill(values);
+    var other_values = d3.range(1000).map(d3.random.normal(1.5, .2)); //irwinHall(10));
+    var other_hist = new hist("other_hist", 20, 0.0, 2.0);
+    other_hist.fill(other_values);
 
-
-    var other_hist = new hist(20, 0.0, 2.0);
-    other_hist.fill(values);
-    my_hist.add(other_hist);
-
-
-    console.log(my_hist);
     my_hist.draw("#the_canvas");
+    other_hist.draw("#the_canvas");
+
     //my_hist.fill(values).draw("#the_canvas");
+
   </script>
 
 
