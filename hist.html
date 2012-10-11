@@ -39,9 +39,7 @@
   <script>
     var values = d3.range(1000).map(d3.random.irwinHall(10));
     var my_hist = new hist(20, 0.0, 2.0);
-    console.log(my_hist);
-    console.log( my_hist.data(values) );
-    my_hist.data(values).draw("#the_canvas");
+    my_hist.fill(values).draw("#the_canvas");
   </script>
 
 
