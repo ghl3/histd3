@@ -60,20 +60,13 @@ hist.prototype.draw = function(selector) {
 	.append("g")
 	.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-    //var x_scale = this.x;
-    //var y_scale = this.y;
-    //var this_hist_bins = this.hist_bins;
-
     var bar = svg.selectAll(".bar")
 	.data(self.hist_bins)
 	.enter().append("g")
 	.attr("class", "bar")    
 	.attr("transform", function(d) { 
-	    //return "translate(" + this.x(d.x) + "," + this.y(d.y) + ")"; 
 	    return "translate(" + self.x(d.x) + "," + self.y(d.y) + ")"; 
 	});
-    
-    // var this_height = this.height;
     
     bar.append("rect")
 	.attr("x", 1)
