@@ -59,61 +59,13 @@ hist.prototype.fill = function(values) {
     return this;
 }
 
-/*
-hist.prototype._plot_histogram = function(selector) {
 
-    var bar = svg.selectAll(".bar")
-	.data(self.hist_bins)
-	.enter().append("g")
-	.attr("class", "bar")    
-	.attr("transform", function(d) { 
-	    return "translate(" + self.x(d.x) + "," + self.y(d.y) + ")"; 
-	});
-    
-    bar.append("rect")
-	.attr("x", 1)
-	.attr("width", this.x(this.hist_bins[0].dx) - 1)
-	.attr("height", function(d) { return self.height - self.y(d.y); });
+hist.prototype._draw_bins = function(svg) {
 
-    bar.append("text")
-	.attr("dy", ".75em")
-	.attr("y", 6)
-	.attr("x", this.x(this.hist_bins[0].dx) / 2)
-	.attr("text-anchor", "middle")
-	.text(function(d) { return formatCount(d.y); });
-}
-*/
-
-// Function to draw the histogram in the
-// dom object described by the selector
-hist.prototype.draw = function(selector) {
-
-
-    if( this.hist_bins == null ) {
-	console.log("Cannot Draw histogram, it does not appear to be filled");
-	return;
-    }
-    
-    // javascript kinda sucks... sorry...
     var self = this;
 
-    // Update the scale for drawing
-    this._update_scale();
-
+    // Not sure what this does...
     var formatCount = d3.format(",.0f");
-
-    // Create the x axis
-    var xAxis = d3.svg.axis()
-	.scale(this.x)
-	.orient("bottom");
-
-    // Get the div and add a 'svg' canvas
-    var svg = d3.select(selector).append("svg")
-	.attr("width", this.width + this.margin.left + this.margin.right)
-	.attr("height", this.height + this.margin.top + this.margin.bottom)
-	.append("g")
-	.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-
 
     // Grab the data of the class 'bar'
     // But, also add the name
@@ -138,6 +90,68 @@ hist.prototype.draw = function(selector) {
 	.attr("x", this.x(this.hist_bins[0].dx) / 2)
 	.attr("text-anchor", "middle")
 	.text(function(d) { return formatCount(d.y); });
+
+}
+
+
+// Function to draw the histogram in the
+// dom object described by the selector
+hist.prototype.draw = function(selector) {
+
+
+    if( this.hist_bins == null ) {
+	console.log("Cannot Draw histogram, it does not appear to be filled");
+	return;
+    }
+    
+    // javascript kinda sucks... sorry...
+    var self = this;
+
+    // Update the scale for drawing
+    this._update_scale();
+
+
+
+    // Create the x axis
+    var xAxis = d3.svg.axis()
+	.scale(this.x)
+	.orient("bottom");
+
+    // Get the div and add a 'svg' canvas
+    var svg = d3.select(selector).append("svg")
+	.attr("width", this.width + this.margin.left + this.margin.right)
+	.attr("height", this.height + this.margin.top + this.margin.bottom)
+	.append("g")
+	.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+
+
+    // Grab the data of the class 'bar'
+    // But, also add the name
+    var bar_selector = ".bar ." + this.name;
+
+    this._draw_bins(svg);
+    /*
+    var bar = svg.selectAll(bar_selector)
+	.data(self.hist_bins)
+	.enter().append("g")
+	.attr("class", "bar " + this.name)    
+	//.attr("class", this.name)    
+	.attr("transform", function(d) { 
+	    return "translate(" + self.x(d.x) + "," + self.y(d.y) + ")"; 
+	});
+    
+    bar.append("rect")
+	.attr("x", 1)
+	.attr("width", this.x(this.hist_bins[0].dx) - 1)
+	.attr("height", function(d) { return self.height - self.y(d.y); });
+
+    bar.append("text")
+	.attr("dy", ".75em")
+	.attr("y", 6)
+	.attr("x", this.x(this.hist_bins[0].dx) / 2)
+	.attr("text-anchor", "middle")
+	.text(function(d) { return formatCount(d.y); });
+    */
 
     svg.append("g")
 	.attr("class", "x axis")
