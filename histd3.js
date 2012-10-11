@@ -41,6 +41,18 @@ hist.prototype._update_scale = function() {
 	.range([this.height, 0]);
 }
 
+hist.prototype._copy_scale = function(hist) {
+
+    // Copy the scale of 'this' histogram 
+    // to the target histogram: 'hist'
+    hist.margin = this.margin;
+    hist.width = this.width;
+    hist.height = this.height;
+
+    hist.x = this.x;
+    hist.y = this.y;
+
+}
 
 // Simple function to set the data
 hist.prototype.fill = function(values) { 
@@ -69,7 +81,7 @@ hist.prototype._draw_bins = function(svg) {
     var self = this;
 
     // Update the scale for drawing
-    self._update_scale();
+    //self._update_scale();
 
     // Not sure what this does...
     var formatCount = d3.format(",.0f");
@@ -266,24 +278,6 @@ stack.prototype.draw = function(selector) {
     // javascript kinda sucks... sorry...
     var self = this;
 
-    var template = self.hist_list[0];
-
-    // Update the scale for drawing
-    //this._update_scale();
-
-    // Create the x axis
-    var xAxis = d3.svg.axis()
-	.scale(template.x)
-	.orient("bottom");
-
-    // Get the div and add a 'svg' canvas
-    var svg = d3.select(selector).append("svg")
-	.attr("width", template.width + template.margin.left + template.margin.right)
-	.attr("height", template.height + template.margin.top + template.margin.bottom)
-	.append("g")
-	.attr("transform", "translate(" + template.margin.left + "," + template.margin.top + ")");
-
-
     // To 'stack' histograms, we just add them.
     var stacked_list = new Array();
     for( var i=0; i < this.hist_list.length; ++i ) {
@@ -300,6 +294,38 @@ stack.prototype.draw = function(selector) {
 
 	stacked_list.push(tmp_hist);
     }
+
+    // Now, based on the stacking,
+    // we draw the histograms
+
+    // Pick the last histogram as the template
+    // (since it is the tallest)
+    var template = stacked_list[ stacked_list.length-1 ];
+
+    // Set the scale of the template
+    template._update_scale();
+    
+    // Now copy that scale to all the other histograms
+    // to ensure that they are all drawn on the same scale
+    for( var i=0; i < stacked_list.length; ++i ) {
+	template._copy_scale(stacked_list[i]);
+    }
+
+    // Update the scale for drawing
+    // this._update_scale();
+
+    // Create the x axis
+    var xAxis = d3.svg.axis()
+	.scale(template.x)
+	.orient("bottom");
+
+    // Get the div and add a 'svg' canvas
+    var svg = d3.select(selector).append("svg")
+	.attr("width", template.width + template.margin.left + template.margin.right)
+	.attr("height", template.height + template.margin.top + template.margin.bottom)
+	.append("g")
+	.attr("transform", "translate(" + template.margin.left + "," + template.margin.top + ")");
+
 
     // Loop over the internal histogram and draw their bins
     /*
