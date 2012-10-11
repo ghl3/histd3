@@ -24,15 +24,20 @@ var var_max = 2.0;
 // The class
 //
 
-var hist(num_bins, var_min, var_max) {
+function hist(num_bins, var_min, var_max) {
 
     this.bins = num_bins;
     this.min = var_min;
     this.max = var_max;
 
+    this.data_values = null;
 }
 
-hist.prototype.draw = function();
+hist.prototype.data = function(values) { 
+    this.data_values = values; 
+    return this;
+}
+
 
 function draw(values, num_bins, var_min, var_max, div_select) {
 
@@ -85,5 +90,16 @@ function draw(values, num_bins, var_min, var_max, div_select) {
 }
 
 
+hist.prototype.draw = function(div_select) {
+    draw(this.data_values, this.bins, this.min, this.max, div_select);
+    return this;
+}
+
+
 // Make the hist
-hist(values, num_bins, var_min, var_max, canvas_name);
+//hist(values, num_bins, var_min, var_max, canvas_name);
+
+var my_hist = new hist(num_bins, var_min, var_max);
+console.log( my_hist );
+
+my_hist.data(values).draw(canvas_name);
