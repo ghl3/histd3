@@ -9,7 +9,7 @@ function hist(num_bins, var_min, var_max) {
     this.min = var_min;
     this.max = var_max;
 
-    this.data_values = null;
+    //this.data_values = null;
     this.hist_bins = null;
 
 
@@ -30,10 +30,10 @@ function hist(num_bins, var_min, var_max) {
 
 // Simple function to set the data
 hist.prototype.fill = function(values) { 
-    this.data_values = values; 
+    //this.data_values = values; 
 
     // Generate a histogram using twenty uniformly-spaced bins.
-    this.hist_bins = d3.layout.histogram().bins(this.x.ticks(this.bins))(this.data_values);
+    this.hist_bins = d3.layout.histogram().bins(this.x.ticks(this.bins))(values);
 
     this.y.domain([0, d3.max(this.hist_bins, function(d) { return d.y; })])
 	.range([this.height, 0]);
