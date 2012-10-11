@@ -51,8 +51,13 @@
     var other_hist = new hist("other_hist", 20, 0.0, 2.0);
     other_hist.fill(other_values);
 
-    my_hist.draw("#the_canvas");
-    other_hist.draw("#the_canvas");
+    var my_stack = new stack();
+    my_stack.add_hist(my_hist);
+    my_stack.add_hist(other_hist);
+    my_stack.draw("#the_canvas");
+
+    //my_hist.draw("#the_canvas");
+    //other_hist.draw("#the_canvas");
 
     //my_hist.fill(values).draw("#the_canvas");
 
