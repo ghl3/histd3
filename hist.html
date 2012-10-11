@@ -43,11 +43,11 @@
 
   <script>
 
-    var values = d3.range(1000).map(d3.random.normal(.5, .2)); //irwinHall(10));
+    var values = d3.range(1000).map(d3.random.normal(1.0, .2)); //irwinHall(10));
     var my_hist = new hist("my_hist", 20, 0.0, 2.0);
     my_hist.fill(values);
 
-    var other_values = d3.range(1000).map(d3.random.normal(1.5, .2)); //irwinHall(10));
+    var other_values = d3.range(1000).map(d3.random.normal(1.0, .2)); //irwinHall(10));
     var other_hist = new hist("other_hist", 20, 0.0, 2.0);
     other_hist.fill(other_values);
 

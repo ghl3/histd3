@@ -39,7 +39,6 @@ hist.prototype._update_scale = function() {
     this.y = d3.scale.linear()
 	.domain([0, d3.max(this.hist_bins, function(d) { return d.y; })])
 	.range([this.height, 0]);
-    
 }
 
 
@@ -285,9 +284,32 @@ stack.prototype.draw = function(selector) {
 	.attr("transform", "translate(" + template.margin.left + "," + template.margin.top + ")");
 
 
+    // To 'stack' histograms, we just add them.
+    var stacked_list = new Array();
+    for( var i=0; i < this.hist_list.length; ++i ) {
+
+	// Make a copy of the histogram
+	var tmp_hist = this.hist_list[i]; //JSON.parse(JSON.stringify(this.hist_list[i]));
+
+	// Now, loop over the histograms 'below' it
+	// and add their contents
+	for( var j=i-1; j >= 0; --j ) {
+	    console.log("Stacking hists: " + i + " " + j);
+	    tmp_hist.add(this.hist_list[j]);
+	}
+
+	stacked_list.push(tmp_hist);
+    }
+
     // Loop over the internal histogram and draw their bins
+    /*
     for( var i=0; i < this.hist_list.length; ++i ) {
 	this.hist_list[i]._draw_bins(svg);
+    }
+    */
+    for( var i=0; i < stacked_list.length; ++i ) {
+	var hist_idx = stacked_list.length - i - 1;
+	stacked_list[hist_idx]._draw_bins(svg);
     }
 
     // Finalize
