@@ -179,6 +179,17 @@ hist.prototype.draw = function(selector) {
 	.scale(this.x)
 	.orient("bottom");
 
+    // Create the y axis
+    var yAxis = d3.svg.axis()
+	.scale(this.y)
+	.orient("left");
+/*
+    // Create the y axis
+    var xAxis = d3.svg.append("g")
+        .attr("class", "y axis")
+        .attr("transform", "translate(" + width + ",0)")
+        .call(yAxis);
+*/
     // Get the div and add a 'svg' canvas
     var svg = d3.select(selector).append("svg")
 	.attr("width", this.width + this.margin.left + this.margin.right)
@@ -219,11 +230,18 @@ hist.prototype.draw = function(selector) {
 	.text(function(d) { return formatCount(d.y); });
     */
     
-    // Add the axis to the svg
+    // Add the x axis to the svg
     svg.append("g")
 	.attr("class", "x axis")
 	.attr("transform", "translate(0," + this.height + ")")
 	.call(xAxis);
+
+    // Add the y axis to the svg
+    svg.append("g")
+	.attr("class", "y axis")
+	//.attr("transform", "translate(2,0)")
+	.call(yAxis);
+
 
     return this;
 }
@@ -360,6 +378,12 @@ stack.prototype.draw = function(selector) {
 	.scale(template.x)
 	.orient("bottom");
 
+    // Create the y axis
+    var yAxis = d3.svg.axis()
+	.scale(template.y)
+	.orient("left");
+
+
     // Get the div and add a 'svg' canvas
     var svg = d3.select(selector).append("svg")
 	.attr("width", template.width + template.margin.left + template.margin.right)
@@ -385,6 +409,12 @@ stack.prototype.draw = function(selector) {
 	.attr("class", "x axis")
 	.attr("transform", "translate(0," + template.height + ")")
 	.call(xAxis);
+
+    svg.append("g")
+	.attr("class", "y axis")
+	//.attr("transform", "translate(2,0)")
+	.call(yAxis);
+
 
     return this;
 
