@@ -222,7 +222,6 @@ hist.prototype.draw = function(selector) {
 	.append("g")
 	.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-
     // Use the dedicated methods to draw
     this._draw_bins(svg);
     this._draw_axes(svg);
@@ -230,6 +229,34 @@ hist.prototype.draw = function(selector) {
     return this;
 }
 
+
+// 
+hist.prototype.drawSame = function(selector) {
+
+    if( this.hist_bins == null ) {
+	console.log("Cannot Draw histogram, it does not appear to be filled");
+	return;
+    }
+    
+    // javascript kinda sucks... sorry...
+    var self = this;
+
+    // Grab the svg in this selector
+    var svg = d3.select(selector).select("svg");
+
+    // Set the current scale to correspond to a histogram
+    // that is already drawn on the pad
+    // This is somewhat "hacky" for now, could be rethought later...
+
+    // Update the scale for drawing
+    self._update_scale();
+
+    // Use the dedicated methods to draw
+    this._draw_bins(svg);
+
+    return this;
+
+}
 
 hist.prototype.add = function(other) { 
 
@@ -315,6 +342,35 @@ stack.prototype.add_hist = function(hist) {
     this.hist_list.push(hist);
 }
 
+stack.prototype._create_stacked_bins = function() {
+
+
+    // To 'stack' histograms, we just add them.
+    var stacked_list = new Array();
+    //var data_list = new Array();
+    for( var i=0; i < this.hist_list.length; ++i ) {
+
+	// Make a copy of the histogram
+	//var tmp_hist = this.hist_list[i]; //JSON.parse(JSON.stringify(this.hist_list[i]));
+	var tmp_hist = this.hist_list[i].clone(); //JSON.parse(JSON.stringify(this.hist_list[i]));
+
+	// Now, loop over the histograms 'below' it
+	// and add their contents
+	for( var j=i-1; j >= 0; --j ) {
+	    console.log("Stacking hists: " + i + " " + j);
+	    tmp_hist.add(this.hist_list[j]);
+	}
+
+	stacked_list.push(tmp_hist);
+	//if( tmp_hist._show_data ) {
+	//    data_list.push(tmp_hist);
+	//}
+    }
+
+    return stacked_list;
+
+}
+
 stack.prototype.draw = function(selector) {
 
     // Create the axis and svg
@@ -322,6 +378,8 @@ stack.prototype.draw = function(selector) {
     // javascript kinda sucks... sorry...
     var self = this;
 
+    var stacked_list = this._create_stacked_bins();
+    /*
     // To 'stack' histograms, we just add them.
     var stacked_list = new Array();
     var data_list = new Array();
@@ -343,7 +401,7 @@ stack.prototype.draw = function(selector) {
 	    data_list.push(tmp_hist);
 	}
     }
-
+*/
     // Now, based on the stacking,
     // we draw the histograms
 
@@ -369,6 +427,8 @@ stack.prototype.draw = function(selector) {
 	.append("g")
 	.attr("transform", "translate(" + template.margin.left + "," + template.margin.top + ")");
 
+    console.log("SVG:");
+    console.log(svg);
 
     // Loop over the internal histogram and draw their bins
     for( var i=0; i < stacked_list.length; ++i ) {
@@ -381,4 +441,33 @@ stack.prototype.draw = function(selector) {
 
     return this;
 
+}
+
+
+stack.prototype.drawSame = function(selector) {
+
+        
+    // javascript kinda sucks... sorry...
+    var self = this;
+
+    // Grab the svg in this selector
+    var svg = d3.select(selector).select("svg");
+
+    var stacked_list = this._create_stacked_bins();
+
+    var template = stacked_list[ stacked_list.length-1 ];
+
+    // Set the scale of the template
+    template._update_scale();
+    for( var i=0; i < stacked_list.length; ++i ) {
+	template._copy_scale(stacked_list[i]);
+    }
+
+    for( var i=0; i < stacked_list.length; ++i ) {
+	var hist_idx = stacked_list.length - i - 1;
+	stacked_list[hist_idx]._draw_bins(svg);
+    }
+    
+    return this;
+    
 }
