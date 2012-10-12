@@ -242,7 +242,7 @@ hist.prototype.drawSame = function(selector) {
     var self = this;
 
     // Grab the svg in this selector
-    var svg = d3.select(selector).select("svg");
+    var svg = d3.select(selector).select("svg").select("g");
 
     // Set the current scale to correspond to a histogram
     // that is already drawn on the pad
@@ -450,7 +450,7 @@ stack.prototype.drawSame = function(selector) {
     var self = this;
 
     // Grab the svg in this selector
-    var svg = d3.select(selector).select("svg");
+    var svg = d3.select(selector).select("svg").select("g");
 
     var stacked_list = this._create_stacked_bins();
 
@@ -498,6 +498,10 @@ function canvas(selector) {
 
 }
 
+canvas.prototype.add = function(obj) {
+    this._object_list.push(obj);
+    return this;
+}
 
 canvas.prototype.draw = function() {
     
