@@ -446,7 +446,6 @@ stack.prototype.draw = function(selector) {
 
 stack.prototype.drawSame = function(selector) {
 
-        
     // javascript kinda sucks... sorry...
     var self = this;
 
@@ -470,4 +469,59 @@ stack.prototype.drawSame = function(selector) {
     
     return this;
     
+}
+
+
+
+// Declare the 'canvas' class
+function canvas(selector) {
+
+    // A canvas is a convenient way to
+    // plot multiple histograms on the
+    // same plot and to update them
+    // simultaneously
+
+    // Calculate the boundaries
+    this.margin = {top: 10, right: 30, bottom: 30, left: 30};
+    this.width = 960 - this.margin.left - this.margin.right;
+    this.height = 500 - this.margin.top - this.margin.bottom;
+
+    // create the svg
+    this.svg = d3.select(selector).append("svg")
+	.attr("width", this.width + this.margin.left + this.margin.right)
+	.attr("height", this.height + this.margin.top + this.margin.bottom)
+	.append("g")
+	.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+    
+    // The list of objects owned by this canvas
+    this._object_list = new Array();
+
+}
+
+
+canvas.prototype.draw = function() {
+    
+    var self = this;
+
+    if( this._object_list.length == 0 ) {
+	console.log("Cannot draw canvas, no object added");
+	return;
+    }
+
+    var template = this._object_list[0];
+
+    // This is where we could change the scale...
+
+    for(var i=0; i < this._object_list.length; ++i) {
+	var obj = this._object_list[i];
+	// Scale the histogram to match this canvas
+	template._copy_scale(obj);
+	// Draw it
+	obj._draw_bins(self.svg);
+    }
+
+    template._draw_axes(svg);
+
+    return this;
+
 }
