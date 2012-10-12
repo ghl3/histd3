@@ -12,8 +12,9 @@ function hist(name, num_bins, var_min, var_max) {
 
     this.hist_bins = null;
 
-    // Default Color
+    // Attributes
     this._color = "steelblue";
+    this._show_values = true;
 
     // Calculate the boundaries
     this.margin = {top: 10, right: 30, bottom: 30, left: 30},
@@ -81,6 +82,11 @@ hist.prototype.color = function(the_color) {
     return this;
 }
 
+hist.prototype.show_values = function(do_show_values) {
+    this._show_values = do_show_values;
+    return this;
+}
+
 
 // Simple function to set the data
 hist.prototype.fill = function(values) { 
@@ -136,12 +142,17 @@ hist.prototype._draw_bins = function(svg) {
 	.attr("shape-rendering", "crispEdges")
 	.attr("fill", this._color);
 
-    bar.append("text")
-	.attr("dy", ".75em")
-	.attr("y", 6)
-	.attr("x", this.x(this.hist_bins[0].dx) / 2)
-	.attr("text-anchor", "middle")
-	.text(function(d) { return formatCount(d.y); });
+    if( this._show_values ) {
+	bar.append("text")
+	    .attr("dy", ".75em")
+	    .attr("y", 6)
+	    .attr("x", this.x(this.hist_bins[0].dx) / 2)
+	    .attr("text-anchor", "middle")
+	    .text(function(d) { 
+		if( d.y == 0 ) return "";
+		return formatCount(d.y); 
+	    });
+    }
 
     return this;
 
