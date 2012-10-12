@@ -17,8 +17,8 @@ function hist(name, num_bins, var_min, var_max) {
     this._show_values = true;
 
     // Calculate the boundaries
-    this.margin = {top: 10, right: 30, bottom: 30, left: 30},
-    this.width = 960 - this.margin.left - this.margin.right,
+    this.margin = {top: 10, right: 30, bottom: 30, left: 30};
+    this.width = 960 - this.margin.left - this.margin.right;
     this.height = 500 - this.margin.top - this.margin.bottom;
 
     // Create the x and y scales
@@ -40,13 +40,19 @@ hist.prototype.clone = function() {
     cloned_hist.hist_bins = this.hist_bins.slice();
 
     // Clone the margins
-    cloned_hist.margin = this.margin.slice();
+    cloned_hist.margin = this.margin; //.slice();
     cloned_hist.weight = this.weight;
     cloned_hist.width = this.width;
     
     // Cone the functions
     cloned_hist.x = this.x.bind({});
     cloned_hist.y = this.y.bind({});
+
+    // Attributes
+    cloned_hist._color = this._color;
+    cloned_hist._show_values = this._show_values;
+
+    return cloned_hist;
 
 }
 
@@ -93,15 +99,8 @@ hist.prototype.fill = function(values) {
 
     // Generate a histogram using twenty uniformly-spaced bins.
     this.hist_bins = d3.layout.histogram().bins(this.x.ticks(this.bins))(values);
-
-    //this._update_scale();
-
-    /*
-    this.y.domain([0, d3.max(this.hist_bins, function(d) { return d.y; })])
-	.range([this.height, 0]);
-    */
-
     return this;
+
 }
 
 
@@ -113,9 +112,6 @@ hist.prototype._draw_bins = function(svg) {
     // based on this histogram's name
 
     var self = this;
-
-    // Update the scale for drawing
-    //self._update_scale();
 
     // Not sure what this does...
     var formatCount = d3.format(",.0f");
@@ -200,25 +196,6 @@ hist.prototype.draw = function(selector) {
     // Update the scale for drawing
     self._update_scale();
 
-/*
-    // Create the x axis
-    var xAxis = d3.svg.axis()
-	.scale(this.x)
-	.orient("bottom");
-
-    // Create the y axis
-    var yAxis = d3.svg.axis()
-	.scale(this.y)
-	.orient("left");
-*/
-
-/*
-    // Create the y axis
-    var xAxis = d3.svg.append("g")
-        .attr("class", "y axis")
-        .attr("transform", "translate(" + width + ",0)")
-        .call(yAxis);
-*/
     // Get the div and add a 'svg' canvas
     var svg = d3.select(selector).append("svg")
 	.attr("width", this.width + this.margin.left + this.margin.right)
@@ -227,57 +204,13 @@ hist.prototype.draw = function(selector) {
 	.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
 
-    // Use the dedicated method to draw
+    // Use the dedicated methods to draw
     this._draw_bins(svg);
-
-    /*
-
-    // Grab the data of the class 'bar'
-    // But, also add the name
-    var bar_selector = ".bar ." + this.name;
-
-
-    var bar = svg.selectAll(bar_selector)
-	.data(self.hist_bins)
-	.enter().append("g")
-	.attr("class", "bar " + this.name)    
-	//.attr("class", this.name)    
-	.attr("transform", function(d) { 
-	    return "translate(" + self.x(d.x) + "," + self.y(d.y) + ")"; 
-	});
-    
-    bar.append("rect")
-	.attr("x", 1)
-	.attr("width", this.x(this.hist_bins[0].dx) - 1)
-	.attr("height", function(d) { return self.height - self.y(d.y); });
-
-    bar.append("text")
-	.attr("dy", ".75em")
-	.attr("y", 6)
-	.attr("x", this.x(this.hist_bins[0].dx) / 2)
-	.attr("text-anchor", "middle")
-	.text(function(d) { return formatCount(d.y); });
-    */
-  
-/*  
-    // Add the x axis to the svg
-    svg.append("g")
-	.attr("class", "x axis")
-	.attr("transform", "translate(0," + this.height + ")")
-	.call(xAxis);
-
-    // Add the y axis to the svg
-    svg.append("g")
-	.attr("class", "y axis")
-	//.attr("transform", "translate(2,0)")
-	.call(yAxis);
-
-*/
-
     this._draw_axes(svg);
 
     return this;
 }
+
 
 hist.prototype.add = function(other) { 
 
@@ -375,7 +308,8 @@ stack.prototype.draw = function(selector) {
     for( var i=0; i < this.hist_list.length; ++i ) {
 
 	// Make a copy of the histogram
-	var tmp_hist = this.hist_list[i]; //JSON.parse(JSON.stringify(this.hist_list[i]));
+	//var tmp_hist = this.hist_list[i]; //JSON.parse(JSON.stringify(this.hist_list[i]));
+	var tmp_hist = this.hist_list[i].clone(); //JSON.parse(JSON.stringify(this.hist_list[i]));
 
 	// Now, loop over the histograms 'below' it
 	// and add their contents
@@ -396,27 +330,14 @@ stack.prototype.draw = function(selector) {
 
     // Set the scale of the template
     template._update_scale();
-    
+
     // Now copy that scale to all the other histograms
     // to ensure that they are all drawn on the same scale
+    // This is important, all histograms must use same scale
     for( var i=0; i < stacked_list.length; ++i ) {
 	template._copy_scale(stacked_list[i]);
     }
 
-    // Update the scale for drawing
-    // this._update_scale();
-
-/*
-    // Create the x axis
-    var xAxis = d3.svg.axis()
-	.scale(template.x)
-	.orient("bottom");
-
-    // Create the y axis
-    var yAxis = d3.svg.axis()
-	.scale(template.y)
-	.orient("left");
-*/
 
     // Get the div and add a 'svg' canvas
     var svg = d3.select(selector).append("svg")
@@ -427,31 +348,13 @@ stack.prototype.draw = function(selector) {
 
 
     // Loop over the internal histogram and draw their bins
-    /*
-    for( var i=0; i < this.hist_list.length; ++i ) {
-	this.hist_list[i]._draw_bins(svg);
-    }
-    */
     for( var i=0; i < stacked_list.length; ++i ) {
 	var hist_idx = stacked_list.length - i - 1;
 	stacked_list[hist_idx]._draw_bins(svg);
     }
 
+    // Draw the axes (only need to to once)
     template._draw_axes(svg);
-
-/*
-    // Finalize
-    // Add the axis to the svg
-    svg.append("g")
-	.attr("class", "x axis")
-	.attr("transform", "translate(0," + template.height + ")")
-	.call(xAxis);
-
-    svg.append("g")
-	.attr("class", "y axis")
-	//.attr("transform", "translate(2,0)")
-	.call(yAxis);
-*/
 
     return this;
 
