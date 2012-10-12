@@ -158,6 +158,32 @@ hist.prototype._draw_bins = function(svg) {
 
 }
 
+hist.prototype._draw_axes = function(svg) {
+
+
+    // Create the x axis
+    var xAxis = d3.svg.axis()
+	.scale(this.x)
+	.orient("bottom");
+
+    // Create the y axis
+    var yAxis = d3.svg.axis()
+	.scale(this.y)
+	.orient("left");
+
+    // Add the x axis to the svg
+    svg.append("g")
+	.attr("class", "x axis")
+	.attr("transform", "translate(0," + this.height + ")")
+	.call(xAxis);
+
+    // Add the y axis to the svg
+    svg.append("g")
+	.attr("class", "y axis")
+	//.attr("transform", "translate(2,0)")
+	.call(yAxis);
+
+}
 
 // Function to draw the histogram in the
 // dom object described by the selector
@@ -174,6 +200,7 @@ hist.prototype.draw = function(selector) {
     // Update the scale for drawing
     self._update_scale();
 
+/*
     // Create the x axis
     var xAxis = d3.svg.axis()
 	.scale(this.x)
@@ -183,6 +210,8 @@ hist.prototype.draw = function(selector) {
     var yAxis = d3.svg.axis()
 	.scale(this.y)
 	.orient("left");
+*/
+
 /*
     // Create the y axis
     var xAxis = d3.svg.append("g")
@@ -229,7 +258,8 @@ hist.prototype.draw = function(selector) {
 	.attr("text-anchor", "middle")
 	.text(function(d) { return formatCount(d.y); });
     */
-    
+  
+/*  
     // Add the x axis to the svg
     svg.append("g")
 	.attr("class", "x axis")
@@ -242,6 +272,9 @@ hist.prototype.draw = function(selector) {
 	//.attr("transform", "translate(2,0)")
 	.call(yAxis);
 
+*/
+
+    this._draw_axes(svg);
 
     return this;
 }
@@ -373,6 +406,7 @@ stack.prototype.draw = function(selector) {
     // Update the scale for drawing
     // this._update_scale();
 
+/*
     // Create the x axis
     var xAxis = d3.svg.axis()
 	.scale(template.x)
@@ -382,7 +416,7 @@ stack.prototype.draw = function(selector) {
     var yAxis = d3.svg.axis()
 	.scale(template.y)
 	.orient("left");
-
+*/
 
     // Get the div and add a 'svg' canvas
     var svg = d3.select(selector).append("svg")
@@ -403,6 +437,9 @@ stack.prototype.draw = function(selector) {
 	stacked_list[hist_idx]._draw_bins(svg);
     }
 
+    template._draw_axes(svg);
+
+/*
     // Finalize
     // Add the axis to the svg
     svg.append("g")
@@ -414,7 +451,7 @@ stack.prototype.draw = function(selector) {
 	.attr("class", "y axis")
 	//.attr("transform", "translate(2,0)")
 	.call(yAxis);
-
+*/
 
     return this;
 
