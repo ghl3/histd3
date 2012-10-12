@@ -12,6 +12,9 @@ function hist(name, num_bins, var_min, var_max) {
 
     this.hist_bins = null;
 
+    // Default Color
+    this._color = "steelblue";
+
     // Calculate the boundaries
     this.margin = {top: 10, right: 30, bottom: 30, left: 30},
     this.width = 960 - this.margin.left - this.margin.right,
@@ -25,6 +28,24 @@ function hist(name, num_bins, var_min, var_max) {
 
     // Create the y-axis mapping function
     this.y = d3.scale.linear();
+
+}
+
+hist.prototype.clone = function() {
+
+    var cloned_hist = new hist(this.name, this.bins, this.min, this.max);
+    
+    // Clone the array
+    cloned_hist.hist_bins = this.hist_bins.slice();
+
+    // Clone the margins
+    cloned_hist.margin = this.margin.slice();
+    cloned_hist.weight = this.weight;
+    cloned_hist.width = this.width;
+    
+    // Cone the functions
+    cloned_hist.x = this.x.bind({});
+    cloned_hist.y = this.y.bind({});
 
 }
 
@@ -53,6 +74,13 @@ hist.prototype._copy_scale = function(hist) {
     hist.y = this.y;
 
 }
+
+
+hist.prototype.color = function(the_color) {
+    this._color = the_color;
+    return this;
+}
+
 
 // Simple function to set the data
 hist.prototype.fill = function(values) { 
@@ -104,7 +132,9 @@ hist.prototype._draw_bins = function(svg) {
     bar.append("rect")
 	.attr("x", 1)
 	.attr("width", this.x(this.hist_bins[0].dx) - 1)
-	.attr("height", function(d) { return self.height - self.y(d.y); });
+	.attr("height", function(d) { return self.height - self.y(d.y); })
+	.attr("shape-rendering", "crispEdges")
+	.attr("fill", this._color);
 
     bar.append("text")
 	.attr("dy", ".75em")
