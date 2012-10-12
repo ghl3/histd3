@@ -15,6 +15,7 @@ function hist(name, num_bins, var_min, var_max) {
     // Attributes
     this._color = "steelblue";
     this._show_values = true;
+    this._data_points = false;
 
     // Calculate the boundaries
     this.margin = {top: 10, right: 30, bottom: 30, left: 30};
@@ -51,6 +52,7 @@ hist.prototype.clone = function() {
     // Attributes
     cloned_hist._color = this._color;
     cloned_hist._show_values = this._show_values;
+    cloned_hist._data_points = this._data_points;
 
     return cloned_hist;
 
@@ -92,6 +94,10 @@ hist.prototype.show_values = function(do_show_values) {
     this._show_values = do_show_values;
     return this;
 }
+hist.prototype.data_points = function(do_data_points) {
+    this._data_points = do_data_points;
+    return this;
+}
 
 
 // Simple function to set the data
@@ -129,25 +135,38 @@ hist.prototype._draw_bins = function(svg) {
 	.attr("transform", function(d) { 
 	    return "translate(" + self.x(d.x) + "," + self.y(d.y) + ")"; 
 	});
-    
-    // And then do some formatting
-    bar.append("rect")
-	.attr("x", 1)
-	.attr("width", this.x(this.hist_bins[0].dx) - 1)
-	.attr("height", function(d) { return self.height - self.y(d.y); })
-	.attr("shape-rendering", "crispEdges")
-	.attr("fill", this._color);
 
-    if( this._show_values ) {
-	bar.append("text")
-	    .attr("dy", ".75em")
-	    .attr("y", 6)
-	    .attr("x", this.x(this.hist_bins[0].dx) / 2)
-	    .attr("text-anchor", "middle")
-	    .text(function(d) { 
-		if( d.y == 0 ) return "";
-		return formatCount(d.y); 
-	    });
+    if( self._data_points ) {
+	bar.append("circle")
+	    .attr("transform", function(d) { 
+		return "translate(" + self.x(d.dx/2) + ",0)"; 
+	    })
+	    .attr("r", 4)
+	    .attr("fill", "black");
+
+    }
+    else {
+    
+	// And then do some formatting
+	bar.append("rect")
+	    .attr("x", 1)
+	    .attr("width", this.x(this.hist_bins[0].dx) - 1)
+	    .attr("height", function(d) { return self.height - self.y(d.y); })
+	    .attr("shape-rendering", "crispEdges")
+	    .attr("fill", this._color);
+
+	if( this._show_values ) {
+	    bar.append("text")
+		.attr("dy", ".75em")
+		.attr("y", 6)
+		.attr("x", this.x(this.hist_bins[0].dx) / 2)
+		.attr("text-anchor", "middle")
+		.text(function(d) { 
+		    if( d.y == 0 ) return "";
+		    return formatCount(d.y); 
+		});
+	}
+
     }
 
     return this;
@@ -305,6 +324,7 @@ stack.prototype.draw = function(selector) {
 
     // To 'stack' histograms, we just add them.
     var stacked_list = new Array();
+    var data_list = new Array();
     for( var i=0; i < this.hist_list.length; ++i ) {
 
 	// Make a copy of the histogram
@@ -319,6 +339,9 @@ stack.prototype.draw = function(selector) {
 	}
 
 	stacked_list.push(tmp_hist);
+	if( tmp_hist._show_data ) {
+	    data_list.push(tmp_hist);
+	}
     }
 
     // Now, based on the stacking,
